@@ -65,7 +65,7 @@ class LEDController():
     def custom_fill(self, red, green, blue, percentage):
         """Fills a certain amount of the pixels with a given color"""
         try:
-            if validate_rgb_values(self.red, self.green, self.blue):
+            if validate_rgb_values(red, green, blue):
                 self.stop_current_animation()
                 color = Color(red, green, blue)
                 # Calculate the number of pixels to fill based on the percentage
