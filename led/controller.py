@@ -48,7 +48,7 @@ class LEDController():
         try:
             if validate_rgb_values(red, green, blue):
                 self.stop_current_animation()
-                if is_within_range(red, 225, 255) and is_within_range(green, 225, 255) and is_within_range(blue, 225, 255):
+                if is_within_range(red, 225, 255) and is_within_range(green, 225, 255) and is_within_range(blue, 225, 255) and self.strip.getBrightness() > 127:
                     self.strip.setBrightness(127)
                     self.strip.show()
                 color = Color(red, green, blue)
@@ -58,13 +58,15 @@ class LEDController():
                 return True
             else:
                 return False
-        except:
-            return True
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+            return False
         
     def custom_fill(self, red, green, blue, percentage):
         """Fills a certain amount of the pixels with a given color"""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
+                self.stop_current_animation()
                 color = Color(red, green, blue)
                 # Calculate the number of pixels to fill based on the percentage
                 num_pixels = int(self.strip.numPixels() * (percentage / 100.0))
@@ -72,19 +74,19 @@ class LEDController():
                 # Fill the strip with the specified color
                 for i in range(num_pixels):
                     self.strip.setPixelColor(i, color)
-                    self.strip.show()
-                    time.sleep(0.01)
+                self.strip.show()
 
                 # Turn off remaining pixels
                 for i in range(num_pixels, self.strip.numPixels()):
                     self.strip.setPixelColor(i, Color(0, 0, 0))
-                    self.strip.show()
-                    time.sleep(0.01)
+                self.strip.show()
                 return True
             else:
                 return False
-        except:
-            return True
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+            return False
+        
     def stop_current_animation(self):
         """Stops the currently running animation if any."""
         if self.current_animation is not None:
