@@ -69,7 +69,7 @@ class LEDController():
                 self.stop_current_animation()
                 color = Color(red, green, blue)
                 # Calculate the number of pixels to fill based on the percentage
-                num_pixels = int(self.strip.numPixels() * (percentage / 100.0))
+                num_pixels = int(self.strip.numPixels() * (int(percentage) / 100.0))
 
                 # Fill the strip with the specified color
                 for i in range(num_pixels):
