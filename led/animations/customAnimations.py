@@ -124,7 +124,6 @@ class Strobe(Animation):
             print(f"Something went wrong: {e}")
             return False
 
-
 class Color_Chase(Animation):
     def __init__(self, strip, red, green, blue):
         super().__init__(self.color_chase)
@@ -132,43 +131,49 @@ class Color_Chase(Animation):
         self.red = red
         self.green = green
         self.blue = blue
-        # Animation parameters
-        self.MIN_PIXELS = 5        # Minimum number of pixels to start moving
-        self.MAX_PIXELS = 15       # Maximum number of pixels to start moving
-        self.MIN_DELAY = 0.5       # Minimum delay between new pixel groups (in seconds)
-        self.MAX_DELAY = 3.0       # Maximum delay between new pixel groups (in seconds)
+
+        self.tail_length = 10
+        self.wait_ms = 50
 
     def color_chase(self):
-        pixels = []  # List to store the current pixel positions
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
                 num_pixels = self.strip.numPixels()
+                self.animationStarted = True
                 while not self.stopAnimation:
-                    # Move existing pixels
-                    for i in range(len(pixels)):
-                        pixels[i] += 1  # Increment pixel position
-                        if pixels[i] >= num_pixels:
-                            pixels[i] = num_pixels - 1  # Wrap around to the last pixel
+                    pixel_list = [0] * num_pixels  # Initialize an empty pixel list
 
-                    # Add new pixels randomly
-                    num_new_pixels = random.randint(self.MIN_PIXELS, self.MAX_PIXELS)
-                    new_pixels = [random.randint(0, num_pixels - 1) for _ in range(num_new_pixels)]
-                    pixels.extend(new_pixels)
-
-                    # Clearing all Pixels
                     for i in range(num_pixels):
-                        self.strip.setPixelColor(i, 0)
+                        # Shift the pixel list
+                        for j in range(num_pixels - 1, 0, -1):
+                            pixel_list[j] = pixel_list[j - 1]
+
+                        # Add the current pixel to the list
+                        pixel_list[0] = i
+
+                        # Display the tail
+                        for j in range(self.tail_length):
+                            if pixel_list[j] >= 0:
+                                self.strip.setPixelColor(pixel_list[j], color)
+
+                        # Turn on the current pixel
+                        self.strip.setPixelColor(i, color)
+                        self.strip.show()
+
+                        # Turn off the last pixel
+                        if i >= self.tail_length :
+                            self.strip.setPixelColor(i - self.tail_length , 0)
+                            self.strip.show()
+
+                        time.sleep(self.wait_ms / 1000.0)
+
+                    # Turn off the remaining tail
+                    for i in range(self.tail_length ):
+                        if pixel_list[i] >= 0:
+                            self.strip.setPixelColor(pixel_list[i], 0)
+
                     self.strip.show()
-
-                    # Render pixels on the LED strip
-                    for pixel in pixels:
-                        self.strip.setPixelColor(pixel, color)
-                    self.strip.show()  # Update the LED strip
-
-                    # Delay before the next update
-                    delay = random.uniform(self.MIN_DELAY, self.MAX_DELAY)
-                    time.sleep(delay)  # Pause for a random duration
             else:
                 return False
         except Exception as e:
