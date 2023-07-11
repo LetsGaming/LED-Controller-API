@@ -142,11 +142,24 @@ class Color_Chase(Animation):
                 num_pixels = self.strip.numPixels()
                 self.animationStarted = True
                 while not self.stopAnimation:
-                    pixel_list = [0] * num_pixels  # Initialize an empty pixel list
+                    if self.stopAnimation:
+                        break
+                    pixel_list = [-1] * num_pixels
+
+                    # Randomly determine the starting position for the tail
+                    start_position = random.randint(0, num_pixels - self.tail_length - 1)
+                    for i in range(start_position, start_position + self.tail_length):
+                        if self.stopAnimation:
+                            break
+                        pixel_list[i] = i - start_position
 
                     for i in range(num_pixels):
+                        if self.stopAnimation:
+                            break
                         # Shift the pixel list
                         for j in range(num_pixels - 1, 0, -1):
+                            if self.stopAnimation:
+                                break
                             pixel_list[j] = pixel_list[j - 1]
 
                         # Add the current pixel to the list
@@ -154,6 +167,8 @@ class Color_Chase(Animation):
 
                         # Display the tail
                         for j in range(self.tail_length):
+                            if self.stopAnimation:
+                                break
                             if pixel_list[j] >= 0:
                                 self.strip.setPixelColor(pixel_list[j], color)
 
@@ -167,12 +182,14 @@ class Color_Chase(Animation):
                             self.strip.show()
 
                         time.sleep(self.wait_ms / 1000.0)
-
+                        if self.stopAnimation:
+                            break
                     # Turn off the remaining tail
-                    for i in range(self.tail_length ):
+                    for i in range(self.tail_length):
+                        if self.stopAnimation:
+                            break
                         if pixel_list[i] >= 0:
                             self.strip.setPixelColor(pixel_list[i], 0)
-
                     self.strip.show()
             else:
                 return False
