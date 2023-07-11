@@ -8,6 +8,11 @@ start_animations = {
         'name': 'Custom Color',
         'description': 'Sets the color of the complete LED Strip',
         'args': ['red', 'green', 'blue']
+    },
+    'custom_fill': {
+        'name': 'Custom Fill',
+        'description': 'Fills a certain amount of the pixels with a given color',
+        'args': ['red', 'green', 'blue', 'percentage']
     }
 }
 

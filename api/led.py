@@ -21,7 +21,6 @@ def get_brightness():
     response = { 'current_brightness': str(led_controller.get_brightness()) }
     return response
 
-
 @led_api.route('/led/white', methods=['POST'])
 def set_white():
     if led_controller.set_white():
@@ -38,6 +37,15 @@ def fill_color():
         return jsonify(message='Filled strip with color.'), 200
     else:
         return jsonify(message='Error filling strip with color.'), 500
+
+@led_api.route('/led/custom_fill', methods=['POST'])
+def custom_fill():
+    data = request.get_json()
+    red, green, blue, percentage = data.get('red'), data.get('green'), data.get('blue'), data.get('percentage')
+    if led_controller.custom_fill(red, green, blue, percentage):
+        return jsonify(message='Filled amount of strip pixels with color.'), 200
+    else:
+        return jsonify(message='Error filling amount of strip pixels with color.'), 500
 
 # Animation endpoints
 @led_api.route('/led/animations/standard/<string:animation_name>', methods=['POST'])

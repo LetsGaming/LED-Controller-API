@@ -60,7 +60,31 @@ class LEDController():
                 return False
         except:
             return True
+        
+    def custom_fill(self, red, green, blue, percentage):
+        """Fills a certain amount of the pixels with a given color"""
+        try:
+            if validate_rgb_values(self.red, self.green, self.blue):
+                color = Color(red, green, blue)
+                # Calculate the number of pixels to fill based on the percentage
+                num_pixels = int(self.strip.numPixels() * (percentage / 100.0))
 
+                # Fill the strip with the specified color
+                for i in range(num_pixels):
+                    self.strip.setPixelColor(i, color)
+                    self.strip.show()
+                    time.sleep(0.01)
+
+                # Turn off remaining pixels
+                for i in range(num_pixels, self.strip.numPixels()):
+                    self.strip.setPixelColor(i, Color(0, 0, 0))
+                    self.strip.show()
+                    time.sleep(0.01)
+                return True
+            else:
+                return False
+        except:
+            return True
     def stop_current_animation(self):
         """Stops the currently running animation if any."""
         if self.current_animation is not None:
