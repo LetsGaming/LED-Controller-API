@@ -156,9 +156,14 @@ class Color_Chase(Animation):
                     new_pixels = [random.randint(0, num_pixels - 1) for _ in range(num_new_pixels)]
                     pixels.extend(new_pixels)
 
+                    # Clearing all Pixels
+                    for i in range(num_pixels):
+                        self.strip.setPixelColor(i, 0)
+                    self.strip.show()
+
                     # Render pixels on the LED strip
                     for pixel in pixels:
-                        self.strip.setPixelColor(pixel, color)  # Set color to white (you can change it to any color)
+                        self.strip.setPixelColor(pixel, color)
                     self.strip.show()  # Update the LED strip
 
                     # Delay before the next update
