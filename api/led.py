@@ -7,32 +7,49 @@ led_api = Blueprint('led_api', __name__)
 led_controller = LEDController()
 
 # LED strip control endpoints
+@led_api.route('/led/get_online_state', methods=['GET'])
+def get_online_state():
+    onlineState = {'current_online_state': bool(led_controller.get_online_state()) }
+    return onlineState
+
 @led_api.route('/led/set_online_state', methods=['POST'])
 def set_online_state():
     data = request.get_json()
     value = data.get('online')
+
     if led_controller.set_online_state(value):
         return jsonify(message='Set State of strip.'), 200
     else:
         return jsonify(message='Failed setting state of strip'), 500
+    
+@led_api.route('/led/get_brightness', methods=['GET'])
+def get_brightness():
+    controllerResponse = led_controller.get_brightness()
+    if not isinstance(controllerResponse, bool):
+        return jsonify(message=controllerResponse), 409
+    else:
+        response = { 'current_brightness': str(controllerResponse) }
+        return response
 
 @led_api.route('/led/brightness', methods=['POST'])
 def set_brightness():
     data = request.get_json()
     brightness = data.get('brightness')
-    if led_controller.set_brightness(brightness):
+
+    controllerResponse = led_controller.set_brightness(brightness)
+    if not isinstance(controllerResponse, bool):
+        return jsonify(message=controllerResponse), 409
+    elif controllerResponse:
         return jsonify(message='Set Brightness of Strip.'), 200
     else:
         return jsonify(message='Error setting brightness of strip.'), 500
 
-@led_api.route('/led/getBrightness', methods=['GET'])
-def get_brightness():
-    response = { 'current_brightness': str(led_controller.get_brightness()) }
-    return response
-
 @led_api.route('/led/white', methods=['POST'])
 def set_white():
-    if led_controller.set_white():
+    controllerResponse = led_controller.set_white()
+    if not isinstance(controllerResponse, bool):
+        return jsonify(message=controllerResponse), 409
+    elif controllerResponse:
         return jsonify(message='Strip color set to white.'), 200
     else:
         return jsonify(message='Failed setting strip color.'), 500
@@ -42,7 +59,10 @@ def fill_color():
     data = request.get_json()
     red, green, blue = data.get('red'), data.get('green'), data.get('blue')
 
-    if led_controller.fill_color(red, green, blue):
+    controllerResponse = led_controller.fill_color(red, green, blue)
+    if not isinstance(controllerResponse, bool):
+        return jsonify(message=controllerResponse), 409
+    elif controllerResponse:
         return jsonify(message='Filled strip with color.'), 200
     else:
         return jsonify(message='Error filling strip with color.'), 500
@@ -51,7 +71,11 @@ def fill_color():
 def custom_fill():
     data = request.get_json()
     red, green, blue, percentage = data.get('red'), data.get('green'), data.get('blue'), data.get('percentage')
-    if led_controller.custom_fill(red, green, blue, percentage):
+
+    controllerResponse = led_controller.custom_fill(red, green, blue, percentage)
+    if not isinstance(controllerResponse, bool):
+        return jsonify(message=controllerResponse), 409
+    elif controllerResponse:
         return jsonify(message='Filled amount of strip pixels with color.'), 200
     else:
         return jsonify(message='Error filling amount of strip pixels with color.'), 500
@@ -61,7 +85,10 @@ def custom_fill():
 def start_standard_animation(animation_name):
     animation = standard_animations.get(animation_name)
     if animation:
-        if getattr(led_controller, animation_name)():
+        controllerResponse = getattr(led_controller, animation_name)()
+        if not isinstance(controllerResponse, bool):
+            return jsonify(message=controllerResponse), 409
+        elif controllerResponse:
             return jsonify(message=f'{animation["name"]} started.'), 200
         else:
             return jsonify(message='Error starting animation.'), 500
@@ -76,7 +103,10 @@ def start_custom_animation(animation_name):
         missing_args = [arg for arg in args if arg not in request.json]
         if missing_args:
             return jsonify(message=f'Missing arguments: {", ".join(missing_args)}'), 400
-        if getattr(led_controller, animation_name)(**request.json):
+        controllerResponse = getattr(led_controller, animation_name)(**request.json)
+        if not isinstance(controllerResponse, bool):
+            return jsonify(message=controllerResponse), 409
+        elif controllerResponse:
             return jsonify(message=f'{animation["name"]} started.'), 200
         else:
             return jsonify(message='Error starting custom animation.'), 500
@@ -91,7 +121,10 @@ def start_special_animation(animation_name):
         missing_args = [arg for arg in args if arg not in request.json]
         if missing_args:
             return jsonify(message=f'Missing arguments: {", ".join(missing_args)}'), 400
-        if getattr(led_controller, animation_name)(**request.json):
+        controllerResponse = getattr(led_controller, animation_name)(**request.json)
+        if not isinstance(controllerResponse, bool):
+            return jsonify(message=controllerResponse), 409
+        elif controllerResponse:
             return jsonify(message=f'{animation["name"]} started.'), 200
         else:
             return jsonify(message='Error starting special animation.'), 500

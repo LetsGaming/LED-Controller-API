@@ -19,40 +19,57 @@ class LEDController():
         self.strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         self.strip.begin()
         self.current_animation = None
-        self.isOnline = False
+        self.paused_animation = None
         self.animation_event = threading.Event()
-        self.pause_event = threading.Event()
-        self.pause_event.set()
+        self.isOnline = False
 
-    def stop_current_animation(self):
+    def get_online_state(self):
+        return self.isOnline
+
+    def set_online_state(self, value: bool):
+        """Sets whether or not this device should be considered online by other devices."""
+        try:
+            if not self.isOnline and value and self.current_animation is not None:
+                self.isOnline = True
+                self._resume_animation()
+                return True
+            elif self.isOnline and not value and self.current_animation is not None:
+                self.isOnline = False
+                self._pause_animation()
+                return True
+            else:
+                self.isOnline = value
+                return True
+        except Exception as e:
+            print("Error setting Online State:", str(e))
+            return False
+
+    def _pause_animation(self):
+        self.paused_animation = self.current_animation
+        self._stop_current_animation()
+
+    def _resume_animation(self):
+        if self.paused_animation is not None:
+            self._start_animation(self.paused_animation)
+        self.paused_animation = None
+
+    def _stop_current_animation(self):
         """Stops the currently running animation if any."""
         if self.current_animation is not None:
             self.current_animation.stop()
             self.current_animation = None
         self.animation_event.set()  # Signal that animation has stopped
 
-    def start_animation(self, animation):
+    def _start_animation(self, animation):
         """Starts a new animation after stopping the current animation."""
-        self.stop_current_animation()
+        self._stop_current_animation()
         self.animation_event.wait()  # Wait for animation to stop
         self.animation_event.clear()  # Reset the event for the next animation
         self.current_animation = animation
-        animation_thread = threading.Thread(target=self._run_animation)
+        animation_thread = threading.Thread(target=self.current_animation.start)
         animation_thread.start()
 
-    def _run_animation(self):
-        self.current_animation.start()
-        self.stop_current_animation()
-
-    def pause_animation(self):
-        """Pauses the currently running animation."""
-        self.pause_event.clear()
-
-    def resume_animation(self):
-        """Resumes the paused animation."""
-        self.pause_event.set()
-
-    def is_animation_started(self):
+    def _is_animation_started(self):
         """Returns True if an animation is currently running."""
         return self.current_animation is not None
 
@@ -62,14 +79,17 @@ class LEDController():
 
     def set_brightness(self, value):
         try:
-            brightness = int(value)
-            if brightness > -1 and brightness < 256:
-                self.strip.setBrightness(brightness)
-                self.strip.show()
-                return True
-            else: 
-                print("Value not between allowed range")
-                return False
+            if self.isOnline:
+                brightness = int(value)
+                if brightness > -1 and brightness < 256:
+                    self.strip.setBrightness(brightness)
+                    self.strip.show()
+                    return True
+                else: 
+                    print("Value not between allowed range")
+                    return False
+            else:
+                return "The LED-Strip is turned OFF!"
         except Exception as e:
             print(e) 
             return False
@@ -81,18 +101,21 @@ class LEDController():
     def fill_color(self, red, green, blue):
         """Fills all pixels in a specific color"""
         try:
-            if validate_rgb_values(red, green, blue):
-                self.stop_current_animation()
-                if is_within_range(red, 225, 255) and is_within_range(green, 225, 255) and is_within_range(blue, 225, 255) and self.strip.getBrightness() > 127:
-                    self.strip.setBrightness(127)
+            if self.isOnline:
+                if validate_rgb_values(red, green, blue):
+                    self._stop_current_animation()
+                    if is_within_range(red, 225, 255) and is_within_range(green, 225, 255) and is_within_range(blue, 225, 255) and self.strip.getBrightness() > 127:
+                        self.strip.setBrightness(127)
+                        self.strip.show()
+                    color = Color(red, green, blue)
+                    for i in range(self.strip.numPixels()):
+                        self.strip.setPixelColor(i, color)
                     self.strip.show()
-                color = Color(red, green, blue)
-                for i in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(i, color)
-                self.strip.show()
-                return True
+                    return True
+                else:
+                    return False
             else:
-                return False
+                return "The LED-Strip is turned OFF!"
         except Exception as e:
             print(f"Something went wrong: {e}")
             return False
@@ -100,110 +123,131 @@ class LEDController():
     def custom_fill(self, red, green, blue, percentage):
         """Fills a certain amount of the pixels with a given color"""
         try:
-            if validate_rgb_values(red, green, blue):
-                self.stop_current_animation()
-                color = Color(red, green, blue)
-                # Calculate the number of pixels to fill based on the percentage
-                num_pixels = int(self.strip.numPixels() * (int(percentage) / 100.0))
+            if self.isOnline:
+                if validate_rgb_values(red, green, blue):
+                    self._stop_current_animation()
+                    color = Color(red, green, blue)
+                    # Calculate the number of pixels to fill based on the percentage
+                    num_pixels = int(self.strip.numPixels() * (int(percentage) / 100.0))
 
-                # Fill the strip with the specified color
-                for i in range(num_pixels):
-                    self.strip.setPixelColor(i, color)
-                self.strip.show()
+                    # Fill the strip with the specified color
+                    for i in range(num_pixels):
+                        self.strip.setPixelColor(i, color)
+                    self.strip.show()
 
-                # Turn off remaining pixels
-                for i in range(num_pixels, self.strip.numPixels()):
-                    self.strip.setPixelColor(i, Color(0, 0, 0))
-                self.strip.show()
-                return True
+                    # Turn off remaining pixels
+                    for i in range(num_pixels, self.strip.numPixels()):
+                        self.strip.setPixelColor(i, Color(0, 0, 0))
+                    self.strip.show()
+                    return True
+                else:
+                    return False
             else:
-                return False
+                return "The LED-Strip is turned OFF!"
         except Exception as e:
             print(f"Something went wrong: {e}")
             return False
-    
-    def set_online_state(self, value: bool):
-        """Sets whether or not this device should be considered online by other devices."""
-        try:
-            if not self.isOnline and value and self.current_animation is not None:
-                self.isOnline = True
-                self.resume_animation()
-                return True
-            elif self.isOnline and not value and self.current_animation is not None:
-                self.isOnline = False
-                self.pause_animation()
-                for i in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(i, Color(0, 0, 0))
-                self.strip.show()
-                return True
-            else:
-                self.isOnline = value
-                return True
-        except Exception as e:
-            print("Error setting Online State:", str(e))
-            return False
 
     def blink(self, red, green, blue, blinking_speed):
-        animation = Blink(self.strip, red, green, blue, blinking_speed)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Blink(self.strip, red, green, blue, blinking_speed)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def fade(self, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed):
-        animation = Fade(self.strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Fade(self.strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def sparkle(self, red, green, blue, sparkle_count):
-        animation = Sparkle(self.strip, red, green, blue, sparkle_count)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Sparkle(self.strip, red, green, blue, sparkle_count)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
     
     def scanner_effect(self, red, green, blue, scan_speed, tail_length):
-        animation = ScannerEffect(self.strip, red, green, blue, scan_speed, tail_length)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = ScannerEffect(self.strip, red, green, blue, scan_speed, tail_length)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
     
     def yoyo_theater(self, red, green, blue, yoyo_speed):
-        animation = YoyoTheater(self.strip, red, green, blue, yoyo_speed)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
-
+        if self.isOnline:
+            animation = YoyoTheater(self.strip, red, green, blue, yoyo_speed)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
+        
     def breathing_effect(self, red, green, blue, breathing_speed):
-        animation = Breathing_Effect(self.strip, red, green, blue, breathing_speed)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
-
+        if self.isOnline:
+            animation = Breathing_Effect(self.strip, red, green, blue, breathing_speed)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
+        
     def color_wipe(self, red, green, blue):
-        animation = Color_Wipe(self.strip, red, green, blue)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
-    
+        if self.isOnline:
+            animation = Color_Wipe(self.strip, red, green, blue)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
+        
     def theater_chase(self, red, green, blue):
-        animation = Theater_Chase(self.strip, red, green, blue)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Theater_Chase(self.strip, red, green, blue)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def strobe(self, red, green, blue):
-        animation = Strobe(self.strip, red, green, blue)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Strobe(self.strip, red, green, blue)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def color_chase(self, red, green, blue):
-        animation = Color_Chase(self.strip, red, green, blue)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Color_Chase(self.strip, red, green, blue)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def rainbow_cycle(self):
-        animation = Rainbow_Cycle(self.strip)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Rainbow_Cycle(self.strip)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def rainbow_comet(self):
-        animation = Rainbow_Comet(self.strip)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Rainbow_Comet(self.strip)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def theater_chase_rainbow(self):
-        animation = Theater_Chase_Rainbow(self.strip)
-        self.start_animation(animation)
-        return self.isAnimationStarted()
+        if self.isOnline:
+            animation = Theater_Chase_Rainbow(self.strip)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
