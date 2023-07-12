@@ -19,7 +19,42 @@ class LEDController():
         self.strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         self.strip.begin()
         self.current_animation = None
+        self.isOnline = False
         self.animation_event = threading.Event()
+        self.pause_event = threading.Event()
+        self.pause_event.set()
+
+    def stop_current_animation(self):
+        """Stops the currently running animation if any."""
+        if self.current_animation is not None:
+            self.current_animation.stop()
+            self.current_animation = None
+        self.animation_event.set()  # Signal that animation has stopped
+
+    def start_animation(self, animation):
+        """Starts a new animation after stopping the current animation."""
+        self.stop_current_animation()
+        self.animation_event.wait()  # Wait for animation to stop
+        self.animation_event.clear()  # Reset the event for the next animation
+        self.current_animation = animation
+        animation_thread = threading.Thread(target=self._run_animation)
+        animation_thread.start()
+
+    def _run_animation(self):
+        self.current_animation.start()
+        self.stop_current_animation()
+
+    def pause_animation(self):
+        """Pauses the currently running animation."""
+        self.pause_event.clear()
+
+    def resume_animation(self):
+        """Resumes the paused animation."""
+        self.pause_event.set()
+
+    def is_animation_started(self):
+        """Returns True if an animation is currently running."""
+        return self.current_animation is not None
 
     def get_brightness(self):
         """Returns the current strip's brightness level (between 0-255)."""
@@ -86,25 +121,27 @@ class LEDController():
         except Exception as e:
             print(f"Something went wrong: {e}")
             return False
-        
-    def stop_current_animation(self):
-        """Stops the currently running animation if any."""
-        if self.current_animation is not None:
-            self.current_animation.stop()
-            self.current_animation = None
-        self.animation_event.set()  # Signal that animation has stopped
-
-    def start_animation(self, animation):
-        """Starts a new animation after stopping the current animation."""
-        self.stop_current_animation()
-        self.animation_event.wait()  # Wait for animation to stop
-        self.animation_event.clear()  # Reset the event for the next animation
-        self.current_animation = animation
-        animation_thread = threading.Thread(target=self.current_animation.start)
-        animation_thread.start()
-
-    def isAnimationStarted(self):
-        return self.current_animation.isStarted()
+    
+    def set_online_state(self, value: bool):
+        """Sets whether or not this device should be considered online by other devices."""
+        try:
+            if not self.isOnline and value and self.current_animation is not None:
+                self.isOnline = True
+                self.resume_animation()
+                return True
+            elif self.isOnline and not value and self.current_animation is not None:
+                self.isOnline = False
+                self.pause_animation()
+                for i in range(self.strip.numPixels()):
+                    self.strip.setPixelColor(i, Color(0, 0, 0))
+                self.strip.show()
+                return True
+            else:
+                self.isOnline = value
+                return True
+        except Exception as e:
+            print("Error setting Online State:", str(e))
+            return False
 
     def blink(self, red, green, blue, blinking_speed):
         animation = Blink(self.strip, red, green, blue, blinking_speed)

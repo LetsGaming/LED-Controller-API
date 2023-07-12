@@ -7,6 +7,15 @@ led_api = Blueprint('led_api', __name__)
 led_controller = LEDController()
 
 # LED strip control endpoints
+@led_api.route('/led/set_online_state', methods=['POST'])
+def set_online_state():
+    data = request.get_json()
+    value = data.get('online')
+    if led_controller.set_online_state(value):
+        return jsonify(message='Set State of strip.'), 200
+    else:
+        return jsonify(message='Failed setting state of strip'), 500
+
 @led_api.route('/led/brightness', methods=['POST'])
 def set_brightness():
     data = request.get_json()
