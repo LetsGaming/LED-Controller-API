@@ -25,7 +25,7 @@ def set_online_state():
 @led_api.route('/led/get_brightness', methods=['GET'])
 def get_brightness():
     controllerResponse = led_controller.get_brightness()
-    if not isinstance(controllerResponse, bool):
+    if not isinstance(controllerResponse, bool) and not isinstance(controllerResponse, int):
         return jsonify(message=controllerResponse), 409
     else:
         response = { 'current_brightness': str(controllerResponse) }

@@ -29,11 +29,11 @@ class LEDController():
     def set_online_state(self, value: bool):
         """Sets whether or not this device should be considered online by other devices."""
         try:
-            if not self.isOnline and value and self.current_animation is not None:
+            if not self.isOnline and value and self.paused_animation is not None:
                 self.isOnline = True
                 self._resume_animation()
                 return True
-            elif self.isOnline and not value and self.current_animation is not None:
+            elif self.isOnline and not value and self.paused_animation is not None:
                 self.isOnline = False
                 self._pause_animation()
                 return True
@@ -75,7 +75,10 @@ class LEDController():
 
     def get_brightness(self):
         """Returns the current strip's brightness level (between 0-255)."""
-        return self.strip.getBrightness()
+        if self.isOnline:
+            return self.strip.getBrightness()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def set_brightness(self, value):
         try:
