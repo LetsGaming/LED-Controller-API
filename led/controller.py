@@ -22,6 +22,14 @@ class LEDController():
         self.paused_animation = None
         self.animation_event = threading.Event()
         self.isOnline = False
+        # Start with clearing the strip on startup
+        self.clear_strip()
+
+    def clear_strip(self):
+        dark = Color(0,0,0)
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, dark)
+        self.strip.show()
 
     def get_online_state(self):
         return self.isOnline

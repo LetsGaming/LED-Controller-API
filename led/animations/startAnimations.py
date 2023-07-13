@@ -8,9 +8,9 @@ class SetWhite(Animation):
     def set_white(self):
         """Set all pixels to white."""
         try:
-            self.animationStarted = True
             white = Color(255,255,255)
-            for i in range(self.strip.numPixels):
+            self.animationStarted = True
+            for i in range(self.strip.numPixels()):
                 self.strip.setPixelColor(i, white)
             self.strip.setBrightness(127)
             self.strip.show()
