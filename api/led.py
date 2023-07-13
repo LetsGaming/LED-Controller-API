@@ -9,7 +9,7 @@ led_controller = LEDController()
 # LED strip control endpoints
 @led_api.route('/led/get_online_state', methods=['GET'])
 def get_online_state():
-    onlineState = {'current_online_state': str(led_controller.get_online_state()) }
+    onlineState = {'current_online_state': led_controller.get_online_state() }
     return onlineState
 
 @led_api.route('/led/set_online_state', methods=['POST'])

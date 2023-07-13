@@ -33,7 +33,7 @@ class LEDController():
                 self.isOnline = True
                 self._resume_animation()
                 return True
-            elif self.isOnline and not value and self.paused_animation is not None:
+            elif self.isOnline and not value and self.paused_animation is None:
                 self.isOnline = False
                 self._pause_animation()
                 return True
