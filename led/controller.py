@@ -1,9 +1,9 @@
 import threading
 from rpi_ws281x import *
+from led.animations.startAnimations import *
 from led.animations.standardAnimations import *
 from led.animations.customAnimations import *
 from led.animations.specialAnimations import *
-from led.utils import validate_rgb_values, is_within_range
 
 
 LED_COUNT = 300
@@ -98,58 +98,28 @@ class LEDController():
             return False
 
     def set_white(self):
-        """Set all pixels to white."""
-        return self.fill_color(255, 255, 255)
-
+        if self.isOnline:
+            animation = SetWhite(self.strip)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
+    
     def fill_color(self, red, green, blue):
-        """Fills all pixels in a specific color"""
-        try:
-            if self.isOnline:
-                if validate_rgb_values(red, green, blue):
-                    self._stop_current_animation()
-                    if is_within_range(red, 225, 255) and is_within_range(green, 225, 255) and is_within_range(blue, 225, 255) and self.strip.getBrightness() > 127:
-                        self.strip.setBrightness(127)
-                        self.strip.show()
-                    color = Color(red, green, blue)
-                    for i in range(self.strip.numPixels()):
-                        self.strip.setPixelColor(i, color)
-                    self.strip.show()
-                    return True
-                else:
-                    return False
-            else:
-                return "The LED-Strip is turned OFF!"
-        except Exception as e:
-            print(f"Something went wrong: {e}")
-            return False
+        if self.isOnline:
+            animation = FillColor(self.strip, red, green, blue)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
         
     def custom_fill(self, red, green, blue, percentage):
-        """Fills a certain amount of the pixels with a given color"""
-        try:
-            if self.isOnline:
-                if validate_rgb_values(red, green, blue):
-                    self._stop_current_animation()
-                    color = Color(red, green, blue)
-                    # Calculate the number of pixels to fill based on the percentage
-                    num_pixels = int(self.strip.numPixels() * (int(percentage) / 100.0))
-
-                    # Fill the strip with the specified color
-                    for i in range(num_pixels):
-                        self.strip.setPixelColor(i, color)
-                    self.strip.show()
-
-                    # Turn off remaining pixels
-                    for i in range(num_pixels, self.strip.numPixels()):
-                        self.strip.setPixelColor(i, Color(0, 0, 0))
-                    self.strip.show()
-                    return True
-                else:
-                    return False
-            else:
-                return "The LED-Strip is turned OFF!"
-        except Exception as e:
-            print(f"Something went wrong: {e}")
-            return False
+        if self.isOnline:
+            animation = CustomFill(self.strip, red, green, blue, percentage)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def blink(self, red, green, blue, blinking_speed):
         if self.isOnline:
