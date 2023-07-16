@@ -4,6 +4,7 @@ from led.utils import *
 
 
 class Color_Wipe(Animation):
+    """Wipe color across display a pixel at a time."""
     def __init__(self, strip, red, green, blue):
         super().__init__(self.color_wipe)
         self.strip = strip
@@ -12,7 +13,6 @@ class Color_Wipe(Animation):
         self.blue = blue
 
     def color_wipe(self):
-        """Wipe color across display a pixel at a time."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -38,6 +38,7 @@ class Color_Wipe(Animation):
 
 
 class Theater_Chase(Animation):
+    """Movie theater light style chaser animation."""
     def __init__(self, strip, red, green, blue):
         super().__init__(self.theater_chase)
         self.strip = strip
@@ -45,8 +46,7 @@ class Theater_Chase(Animation):
         self.green = green
         self.blue = blue
 
-    def theater_chase(self):
-        """Movie theater light style chaser animation."""
+    def theater_chase(self): 
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -78,6 +78,7 @@ class Theater_Chase(Animation):
 
 
 class Strobe(Animation):
+    """Create a strobe effect by rapidly turning the LEDs on and off."""
     def __init__(self, strip, red, green, blue):
         super().__init__(self.strobe)
         self.strip = strip
@@ -86,7 +87,6 @@ class Strobe(Animation):
         self.blue = blue
 
     def strobe(self):
-        """Create a strobe effect by rapidly turning the LEDs on and off."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -125,6 +125,7 @@ class Strobe(Animation):
             return False
 
 class Color_Chase(Animation):
+    """Create a animation that chases down the strip."""
     def __init__(self, strip, red, green, blue):
         super().__init__(self.color_chase)
         self.strip = strip
@@ -198,13 +199,13 @@ class Color_Chase(Animation):
             return False
         
 class CustomRainbow(Animation):
+    """Displays a rainbow animation on the LED strip using the provided colors."""
     def __init__(self, strip, colors):
         super().__init__(self.custom_rainbow_animation)
         self.strip = strip
         self.colors = colors
 
     def custom_rainbow_animation(self):
-        """Displays a rainbow animation on the LED strip using the provided colors."""
         total_colors = len(self.colors)
         color_step = 256 // total_colors
         self.animationStarted = True

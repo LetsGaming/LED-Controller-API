@@ -86,6 +86,6 @@ special_animations = {
     'breathing_effect': {
         'name': 'Breathing Effect',
         'description': 'Create a breathing effect by gradually changing the brightness of the color.',
-        'args': ['red', 'green', 'blue', 'breathing_speed']
+        'args': ['red', 'green', 'blue', 'breathing_duration']
     }
 }

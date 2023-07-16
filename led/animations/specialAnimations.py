@@ -22,6 +22,7 @@ def fill_color(strip, red, green, blue):
             return False
 
 class Blink(Animation):
+    """Blink all LEDs on and off."""
     def __init__(self, strip, red, green, blue, blinking_speed):
         super().__init__(self.blink)
         self.strip = strip
@@ -31,7 +32,6 @@ class Blink(Animation):
         self.blinking_speed = int(blinking_speed)
 
     def blink(self):
-        """Blink all LEDs on and off."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 self.animationStarted = True
@@ -52,6 +52,7 @@ class Blink(Animation):
 
 
 class Fade(Animation):
+    """Fade the LEDs from one color to another."""
     def __init__(self, strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed):
         super().__init__(self.fade)
         self.strip = strip
@@ -66,7 +67,6 @@ class Fade(Animation):
         self.direction = 1  # 1 for forward, -1 for backward
 
     def fade(self):
-        """Fade the LEDs from one color to another."""
         try:
             if validate_rgb_values(self.from_red, self.from_green, self.from_blue) and validate_rgb_values(
                     self.to_red, self.to_green, self.to_blue):
@@ -94,6 +94,7 @@ class Fade(Animation):
             return False
 
 class Sparkle(Animation):
+    """Create a sparkling effect on the LEDs."""
     def __init__(self, strip, red, green, blue, sparkle_count):
         super().__init__(self.sparkle)
         self.strip = strip
@@ -103,7 +104,6 @@ class Sparkle(Animation):
         self.sparkle_count = int(sparkle_count)
 
     def sparkle(self):
-        """Create a sparkling effect on the LEDs."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 num_pixels = self.strip.numPixels()
@@ -130,6 +130,7 @@ class Sparkle(Animation):
             return False
 
 class ScannerEffect(Animation):
+    """Create a scanner animation with a tail."""
     def __init__(self, strip, red, green, blue, scan_speed, tail_length):
         super().__init__(self.scanner_effect)
         self.strip = strip
@@ -140,7 +141,6 @@ class ScannerEffect(Animation):
         self.tail_length = int(tail_length)
 
     def scanner_effect(self):
-        """Create a scanner animation with a tail."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 num_pixels = self.strip.numPixels()
@@ -202,6 +202,7 @@ class ScannerEffect(Animation):
             return False
 
 class YoyoTheater(Animation):
+    """Create a animation that goes down the strip with a yoyo and theater style"""
     def __init__(self, strip, red, green, blue, yoyo_speed):
         super().__init__(self.yoyo_theater)
         self.strip = strip
@@ -212,7 +213,6 @@ class YoyoTheater(Animation):
         self.tail_length = 8
 
     def yoyo_theater(self):
-        """Create a scanning effect with a fading tail."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 num_pixels = self.strip.numPixels()
@@ -241,7 +241,6 @@ class YoyoTheater(Animation):
                                 tail_color = Color(int(self.red * (tail_brightness / 255)), int(self.green * (tail_brightness / 255)), int(self.blue * (tail_brightness / 255)))
                                 self.strip.setPixelColor(tail_pixel_index, tail_color)
 
-                        # Fade tail pixels into black
                         tail_end_index = pixel_index - self.tail_length - 1
                         if tail_end_index >= 0:
                             for j in range(tail_end_index, -1, -1):
@@ -254,7 +253,6 @@ class YoyoTheater(Animation):
 
                         time.sleep(self.yoyo_speed / (scan_range * num_pixels))
 
-                    # Fade out the last pixel (fade to black)
                     self.strip.setPixelColor(num_pixels - 1, 0)
                     self.strip.show()
 
@@ -266,13 +264,13 @@ class YoyoTheater(Animation):
             return False
 
 class Breathing_Effect(Animation):
-    def __init__(self, strip, red, green, blue, breathing_speed):
+    def __init__(self, strip, red, green, blue, breathing_duration):
         super().__init__(self.breathing_effect)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
-        self.breathing_speed = int(breathing_speed)
+        self.breathing_duration = int(breathing_duration)
 
     def breathing_effect(self):
         """Create a breathing effect by gradually changing the brightness of the color."""
@@ -293,7 +291,7 @@ class Breathing_Effect(Animation):
                             brightness = int(brightness_increment * (i + 1))
                         self.strip.setBrightness(brightness)
                         self.strip.show()
-                        time.sleep(self.breathing_speed / brightness_steps)
+                        time.sleep(self.breathing_duration / brightness_steps)
                         for j in range(self.strip.numPixels()):
                             if self.stopAnimation:
                                 break
@@ -305,7 +303,7 @@ class Breathing_Effect(Animation):
                         brightness = int(brightness_increment * i)
                         self.strip.setBrightness(brightness)
                         self.strip.show()
-                        time.sleep(self.breathing_speed / brightness_steps)
+                        time.sleep(self.breathing_duration / brightness_steps)
                         for j in range(self.strip.numPixels()):
                             if self.stopAnimation:
                                 break
