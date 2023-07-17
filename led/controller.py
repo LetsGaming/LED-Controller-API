@@ -22,8 +22,23 @@ class LEDController():
         self.paused_animation = None
         self.animation_event = threading.Event()
         self.isOnline = False
-        # Start with clearing the strip on startup
-        self.clear_strip()
+
+        # Start with a startup animation and then clearing the strip
+        self.run_startup_animation()
+
+    def run_startup_animation(self):
+       brightness_steps = 50
+       brightness_increment = 255 / brightness_steps
+       for i in range(brightness_steps):
+            if i>1:
+                brightness = int(brightness_increment * i)
+            else:
+                brightness = int(brightness_increment * (i + 1))
+                self.strip.setBrightness(brightness)
+                self.strip.show()
+                time.sleep(self.breathing_duration / brightness_steps)
+                for j in range(self.strip.numPixels()):
+                    self.strip.setPixelColor(j, Color(0,255,0))
 
     def clear_strip(self):
         dark = Color(0,0,0)
@@ -105,138 +120,62 @@ class LEDController():
             print(e) 
             return False
 
-    def set_white(self):
+    def _handle_animation(self, animation: Animation):
         if self.isOnline:
-            animation = SetWhite(self.strip)
             self._start_animation(animation)
             return self._is_animation_started()
         else:
             return "The LED-Strip is turned OFF!"
+
+    def set_white(self):
+        return self._handle_animation(SetWhite(self.strip))
+        
     
     def fill_color(self, red, green, blue):
-        if self.isOnline:
-            animation = FillColor(self.strip, red, green, blue)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(FillColor(self.strip, red, green, blue))
+
         
     def custom_fill(self, red, green, blue, percentage):
-        if self.isOnline:
-            animation = CustomFill(self.strip, red, green, blue, percentage)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(CustomFill(self.strip, red, green, blue, percentage))
 
     def blink(self, red, green, blue, blinking_speed):
-        if self.isOnline:
-            animation = Blink(self.strip, red, green, blue, blinking_speed)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Blink(self.strip, red, green, blue, blinking_speed))
 
     def fade(self, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed):
-        if self.isOnline:
-            animation = Fade(self.strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Fade(self.strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed))
 
     def sparkle(self, red, green, blue, sparkle_count):
-        if self.isOnline:
-            animation = Sparkle(self.strip, red, green, blue, sparkle_count)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Sparkle(self.strip, red, green, blue, sparkle_count))
     
     def scanner_effect(self, red, green, blue, scan_speed, tail_length):
-        if self.isOnline:
-            animation = ScannerEffect(self.strip, red, green, blue, scan_speed, tail_length)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(ScannerEffect(self.strip, red, green, blue, scan_speed, tail_length))
     
     def yoyo_theater(self, red, green, blue, yoyo_speed):
-        if self.isOnline:
-            animation = YoyoTheater(self.strip, red, green, blue, yoyo_speed)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
-        
+        return self._handle_animation(YoyoTheater(self.strip, red, green, blue, yoyo_speed))
+
     def breathing_effect(self, red, green, blue, breathing_speed):
-        if self.isOnline:
-            animation = Breathing_Effect(self.strip, red, green, blue, breathing_speed)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Breathing_Effect(self.strip, red, green, blue, breathing_speed))
         
     def color_wipe(self, red, green, blue):
-        if self.isOnline:
-            animation = Color_Wipe(self.strip, red, green, blue)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Color_Wipe(self.strip, red, green, blue))
         
     def theater_chase(self, red, green, blue):
-        if self.isOnline:
-            animation = Theater_Chase(self.strip, red, green, blue)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Theater_Chase(self.strip, red, green, blue))
 
     def strobe(self, red, green, blue):
-        if self.isOnline:
-            animation = Strobe(self.strip, red, green, blue)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Strobe(self.strip, red, green, blue))
 
     def color_chase(self, red, green, blue):
-        if self.isOnline:
-            animation = Color_Chase(self.strip, red, green, blue)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Color_Chase(self.strip, red, green, blue))
         
     def custom_rainbow(self, colors):
-        if self.isOnline:
-            animation = CustomRainbow(self.strip, colors)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(CustomRainbow(self.strip, colors))
 
     def rainbow_cycle(self):
-        if self.isOnline:
-            animation = Rainbow_Cycle(self.strip)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Rainbow_Cycle(self.strip))
 
     def rainbow_comet(self):
-        if self.isOnline:
-            animation = Rainbow_Comet(self.strip)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Rainbow_Comet(self.strip))
 
     def theater_chase_rainbow(self):
-        if self.isOnline:
-            animation = Theater_Chase_Rainbow(self.strip)
-            self._start_animation(animation)
-            return self._is_animation_started()
-        else:
-            return "The LED-Strip is turned OFF!"
+        return self._handle_animation(Theater_Chase_Rainbow(self.strip))
