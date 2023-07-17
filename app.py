@@ -24,4 +24,4 @@ for api_file in api_files:
     app.register_blueprint(blueprint)
 
 if __name__ == '__main__':
-    app.run(host="192.168.1.110", port=5000)
+    app.run(host="192.168.1.116", port=5000)
