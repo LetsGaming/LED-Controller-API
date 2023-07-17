@@ -35,6 +35,11 @@ standard_animations = {
 }
 
 custom_animations = {
+    'custom_rainbow': {
+        'name': 'Custom Rainbow',
+        'description': 'Displays a rainbow animation on the LED strip using the provided colors.',
+        'args': ['colors'],
+    },
     'color_wipe': {
         'name': 'Color Wipe',
         'description': 'Wipes the LED strip with a single color, creating a visually striking effect.',

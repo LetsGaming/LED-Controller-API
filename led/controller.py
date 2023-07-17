@@ -208,6 +208,14 @@ class LEDController():
             return self._is_animation_started()
         else:
             return "The LED-Strip is turned OFF!"
+        
+    def custom_rainbow(self, colors):
+        if self.isOnline:
+            animation = CustomRainbow(self.strip, colors)
+            self._start_animation(animation)
+            return self._is_animation_started()
+        else:
+            return "The LED-Strip is turned OFF!"
 
     def rainbow_cycle(self):
         if self.isOnline:
