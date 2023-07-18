@@ -28,20 +28,24 @@ class LEDController():
 
     def run_startup_animation(self):
         self.clear_strip()
-        brightness_steps = 50
-        brightness_increment = 255 / brightness_steps
-        for i in range(brightness_steps):
-            if i>1:
-                brightness = int(brightness_increment * i)
-            else:
-                brightness = int(brightness_increment * (i + 1))
-                self.strip.setBrightness(brightness)
-                self.strip.show()
-                time.sleep(1 / brightness_steps)
-                for j in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(j, Color(0,255,0))
-        self.clear_strip()
-        self.strip.setBrightness(255)
+        color = (0, 255, 0)
+        start_time = time.time()
+        duration_ms = 1000
+        end_time = start_time + (duration_ms / 1000.0)
+        fade_interval = 1.0 / LED_BRIGHTNESS
+
+        while time.time() < end_time:
+            elapsed = time.time() - start_time
+            brightness = min(1.0, elapsed / (duration_ms / 1000.0))
+
+            for i in range(self.strip.numPixels()):
+                self.strip.setPixelColor(i, Color(int(color[0] * brightness), int(color[1] * brightness), int(color[2] * brightness)))
+            self.strip.show()
+            time.sleep(fade_interval)
+
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, Color(0, 0, 0))
+        self.strip.show()
 
     def clear_strip(self):
         dark = Color(0,0,0)
