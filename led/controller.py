@@ -30,7 +30,7 @@ class LEDController():
         self.clear_strip()
         color = (0, 255, 0)
         start_time = time.time()
-        duration_ms = 1000
+        duration_ms = 2250
         end_time = start_time + (duration_ms / 1000.0)
         fade_interval = 1.0 / LED_BRIGHTNESS
 
@@ -43,9 +43,7 @@ class LEDController():
             self.strip.show()
             time.sleep(fade_interval)
 
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, Color(0, 0, 0))
-        self.strip.show()
+        self.clear_strip()
 
     def clear_strip(self):
         dark = Color(0,0,0)
@@ -175,8 +173,8 @@ class LEDController():
     def color_chase(self, red, green, blue):
         return self._handle_animation(Color_Chase(self.strip, red, green, blue))
         
-    def custom_rainbow(self, colors):
-        return self._handle_animation(CustomRainbow(self.strip, colors))
+    def custom_rainbow_cycle(self, colors):
+        return self._handle_animation(Custom_Rainbow_Cycle(self.strip, colors))
 
     def rainbow_cycle(self):
         return self._handle_animation(Rainbow_Cycle(self.strip))

@@ -26,7 +26,6 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
-
 class Animation():
     def __init__(self, animation_func):
         self._animation_func = animation_func

@@ -2,17 +2,16 @@ import random
 import time
 from led.utils import *
 
-
 class Color_Wipe(Animation):
     """Wipe color across display a pixel at a time."""
     def __init__(self, strip, red, green, blue):
-        super().__init__(self.color_wipe)
+        super().__init__(self._color_wipe)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
 
-    def color_wipe(self):
+    def _color_wipe(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -36,17 +35,16 @@ class Color_Wipe(Animation):
             print(f"Something went wrong: {e}")
             return False
 
-
 class Theater_Chase(Animation):
     """Movie theater light style chaser animation."""
     def __init__(self, strip, red, green, blue):
-        super().__init__(self.theater_chase)
+        super().__init__(self._theater_chase)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
 
-    def theater_chase(self): 
+    def _theater_chase(self): 
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -76,17 +74,16 @@ class Theater_Chase(Animation):
             print(f"Something went wrong: {e}")
             return False
 
-
 class Strobe(Animation):
     """Create a strobe effect by rapidly turning the LEDs on and off."""
     def __init__(self, strip, red, green, blue):
-        super().__init__(self.strobe)
+        super().__init__(self._strobe)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
 
-    def strobe(self):
+    def _strobe(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -127,7 +124,7 @@ class Strobe(Animation):
 class Color_Chase(Animation):
     """Create a animation that chases down the strip."""
     def __init__(self, strip, red, green, blue):
-        super().__init__(self.color_chase)
+        super().__init__(self._color_chase)
         self.strip = strip
         self.red = red
         self.green = green
@@ -136,7 +133,7 @@ class Color_Chase(Animation):
         self.tail_length = 10
         self.wait_ms = 50
 
-    def color_chase(self):
+    def _color_chase(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)
@@ -198,20 +195,29 @@ class Color_Chase(Animation):
             print(f"Something went wrong: {e}")
             return False
         
-class CustomRainbow(Animation):
-    """Displays a rainbow animation on the LED strip using the provided colors."""
+class Custom_Rainbow_Cycle(Animation):
+    """Draw rainbow that uniformly distributes itself across all pixels."""
     def __init__(self, strip, colors):
-        super().__init__(self.custom_rainbow_animation)
+        super().__init__(self._custom_rainbow_cycle)
         self.strip = strip
         self.colors = colors
 
-    def custom_rainbow_animation(self):
-        total_colors = len(self.colors)
-        color_step = 256 // total_colors
-        self.animationStarted = True
-        while not self.stopAnimation:
-            for i in range(self.strip.numPixels()):
-                color_index = (i * color_step) % 256
-                self.strip.setPixelColor(i, self.colors[color_index // color_step])
-                self.strip.show()
-                time.sleep(20 / 1000.0)
+    def _custom_rainbow_cycle(self):
+        try:
+            self.animationStarted = True
+            while not self.stopAnimation:
+                for j in range(256 * 5):
+                    if self.stopAnimation:
+                        break
+                    for i in range(self.strip.numPixels()):
+                        if self.stopAnimation:
+                            break
+                        color = self.colors[(int(i * len(self.colors) / self.strip.numPixels()) + j) % len(self.colors)]
+                        r, g, b = color
+                        rgb_color = Color(r, g, b)
+                        self.strip.setPixelColor(i, rgb_color)
+                    self.strip.show()
+                    time.sleep(0.02)
+        except Exception as e:
+            print(f"Something went wrong: {e}")
+            return False

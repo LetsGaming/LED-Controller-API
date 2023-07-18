@@ -2,7 +2,6 @@ import time
 import random
 from led.utils import *
 
-
 def fill_color(strip, red, green, blue):
     """Fills all pixels in a specific color"""
     try:
@@ -24,14 +23,14 @@ def fill_color(strip, red, green, blue):
 class Blink(Animation):
     """Blink all LEDs on and off."""
     def __init__(self, strip, red, green, blue, blinking_speed):
-        super().__init__(self.blink)
+        super().__init__(self._blink)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
         self.blinking_speed = int(blinking_speed)
 
-    def blink(self):
+    def _blink(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 self.animationStarted = True
@@ -54,7 +53,7 @@ class Blink(Animation):
 class Fade(Animation):
     """Fade the LEDs from one color to another."""
     def __init__(self, strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed):
-        super().__init__(self.fade)
+        super().__init__(self._fade)
         self.strip = strip
         self.from_red = from_red
         self.from_green = from_green
@@ -66,7 +65,7 @@ class Fade(Animation):
         self.steps = int(steps)
         self.direction = 1  # 1 for forward, -1 for backward
 
-    def fade(self):
+    def _fade(self):
         try:
             if validate_rgb_values(self.from_red, self.from_green, self.from_blue) and validate_rgb_values(
                     self.to_red, self.to_green, self.to_blue):
@@ -96,14 +95,14 @@ class Fade(Animation):
 class Sparkle(Animation):
     """Create a sparkling effect on the LEDs."""
     def __init__(self, strip, red, green, blue, sparkle_count):
-        super().__init__(self.sparkle)
+        super().__init__(self._sparkle)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
         self.sparkle_count = int(sparkle_count)
 
-    def sparkle(self):
+    def _sparkle(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 num_pixels = self.strip.numPixels()
@@ -132,7 +131,7 @@ class Sparkle(Animation):
 class ScannerEffect(Animation):
     """Create a scanner animation with a tail."""
     def __init__(self, strip, red, green, blue, scan_speed, tail_length):
-        super().__init__(self.scanner_effect)
+        super().__init__(self._scanner_effect)
         self.strip = strip
         self.red = red
         self.green = green
@@ -140,7 +139,7 @@ class ScannerEffect(Animation):
         self.scan_speed = int(scan_speed)
         self.tail_length = int(tail_length)
 
-    def scanner_effect(self):
+    def _scanner_effect(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 num_pixels = self.strip.numPixels()
@@ -204,7 +203,7 @@ class ScannerEffect(Animation):
 class YoyoTheater(Animation):
     """Create a animation that goes down the strip with a yoyo and theater style"""
     def __init__(self, strip, red, green, blue, yoyo_speed):
-        super().__init__(self.yoyo_theater)
+        super().__init__(self._yoyo_theater)
         self.strip = strip
         self.red = red
         self.green = green
@@ -212,7 +211,7 @@ class YoyoTheater(Animation):
         self.yoyo_speed = int(yoyo_speed)
         self.tail_length = 8
 
-    def yoyo_theater(self):
+    def _yoyo_theater(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 num_pixels = self.strip.numPixels()
@@ -265,14 +264,14 @@ class YoyoTheater(Animation):
 
 class Breathing_Effect(Animation):
     def __init__(self, strip, red, green, blue, breathing_duration):
-        super().__init__(self.breathing_effect)
+        super().__init__(self._breathing_effect)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
         self.breathing_duration = int(breathing_duration)
 
-    def breathing_effect(self):
+    def _breathing_effect(self):
         """Create a breathing effect by gradually changing the brightness of the color."""
         try:
             if validate_rgb_values(self.red, self.green, self.blue):

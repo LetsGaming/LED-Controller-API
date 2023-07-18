@@ -1,14 +1,13 @@
 import time
 from led.utils import *
 
-
 class Rainbow_Cycle(Animation):
     """Draw rainbow that uniformly distributes itself across all pixels."""
     def __init__(self, strip):
-        super().__init__(self.rainbow_cycle)
+        super().__init__(self._rainbow_cycle)
         self.strip = strip
 
-    def rainbow_cycle(self):
+    def _rainbow_cycle(self):
         try:
             self.animationStarted = True
             while not self.stopAnimation:
@@ -25,14 +24,13 @@ class Rainbow_Cycle(Animation):
             print(f"Something went wrong: {e}")
             return False
 
-
 class Rainbow_Comet(Animation):
     """Create a comet effect with a rainbow tail that moves along the LED strip."""
     def __init__(self, strip):
-        super().__init__(self.rainbow_comet)
+        super().__init__(self._rainbow_comet)
         self.strip = strip
 
-    def rainbow_comet(self):
+    def _rainbow_comet(self):
         try:
             num_pixels = self.strip.numPixels()
             tail_length = 5
@@ -57,14 +55,13 @@ class Rainbow_Comet(Animation):
             print(f"Something went wrong: {e}")
             return False
 
-
 class Theater_Chase_Rainbow(Animation):
     """Rainbow movie theater light style chaser animation."""
     def __init__(self, strip):
-        super().__init__(self.theater_chase_rainbow)
+        super().__init__(self._theater_chase_rainbow)
         self.strip = strip
 
-    def theater_chase_rainbow(self):
+    def _theater_chase_rainbow(self):
         try:
             self.animationStarted = True
             while not self.stopAnimation:

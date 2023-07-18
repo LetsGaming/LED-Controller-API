@@ -3,10 +3,10 @@ from led.utils import *
 class SetWhite(Animation):
     """Set all pixels to white and halfs the brightness."""
     def __init__(self, strip):
-        super().__init__(self.set_white)
+        super().__init__(self._set_white)
         self.strip = strip
 
-    def set_white(self):
+    def _set_white(self):
         try:
             white = Color(255,255,255)
             self.animationStarted = True
@@ -21,13 +21,13 @@ class SetWhite(Animation):
 class FillColor(Animation):
     """Fills all pixels in a specific color"""
     def __init__(self, strip, red, green, blue):
-        super().__init__(self.fill_color)
+        super().__init__(self._fill_color)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
 
-    def fill_color(self):
+    def _fill_color(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 
@@ -48,14 +48,14 @@ class FillColor(Animation):
 class CustomFill(Animation):
     """Fills a certain amount of the pixels with a given color"""
     def __init__(self, strip, red, green, blue, percentage):
-        super().__init__(self.custom_fill)
+        super().__init__(self._custom_fill)
         self.strip = strip
         self.red = red
         self.green = green
         self.blue = blue
         self.percentage = percentage
 
-    def custom_fill(self):
+    def _custom_fill(self):
         try:
             if validate_rgb_values(self.red, self.green, self.blue):
                 color = Color(self.red, self.green, self.blue)

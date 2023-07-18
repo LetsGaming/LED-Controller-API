@@ -35,9 +35,9 @@ standard_animations = {
 }
 
 custom_animations = {
-    'custom_rainbow': {
-        'name': 'Custom Rainbow',
-        'description': 'Displays a rainbow animation on the LED strip using the provided colors.',
+    'custom_rainbow_cycle': {
+        'name': 'Custom Rainbow Cycle',
+        'description': 'Draw rainbow that uniformly distributes itself across all pixels.',
         'args': ['colors'],
     },
     'color_wipe': {
