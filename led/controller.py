@@ -37,7 +37,7 @@ class LEDController():
                 brightness = int(brightness_increment * (i + 1))
                 self.strip.setBrightness(brightness)
                 self.strip.show()
-                time.sleep(self.breathing_duration / brightness_steps)
+                time.sleep(1 / brightness_steps)
                 for j in range(self.strip.numPixels()):
                     self.strip.setPixelColor(j, Color(0,255,0))
         self.clear_strip()
