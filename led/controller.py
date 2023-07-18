@@ -158,8 +158,8 @@ class LEDController():
     def yoyo_theater(self, red, green, blue, yoyo_speed):
         return self._handle_animation(YoyoTheater(self.strip, red, green, blue, yoyo_speed))
 
-    def breathing_effect(self, red, green, blue, breathing_speed):
-        return self._handle_animation(Breathing_Effect(self.strip, red, green, blue, breathing_speed))
+    def breathing_effect(self, red, green, blue, breathing_duration):
+        return self._handle_animation(Breathing_Effect(self.strip, red, green, blue, breathing_duration))
         
     def color_wipe(self, red, green, blue):
         return self._handle_animation(Color_Wipe(self.strip, red, green, blue))
