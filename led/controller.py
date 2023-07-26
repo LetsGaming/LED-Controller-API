@@ -88,7 +88,7 @@ class LEDController():
             self.current_animation = None
         self.animation_event.set()  # Signal that animation has stopped
 
-    def _start_animation(self, animation):
+    def _start_animation(self, animation: Animation):
         """Starts a new animation after stopping the current animation."""
         self._stop_current_animation()
         self.animation_event.wait()  # Wait for animation to stop
@@ -99,7 +99,7 @@ class LEDController():
 
     def _is_animation_started(self):
         """Returns True if an animation is currently running."""
-        return self.current_animation is not None
+        return self.current_animation.isStarted()
 
     def get_brightness(self):
         """Returns the current strip's brightness level (between 0-255)."""

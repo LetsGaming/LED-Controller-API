@@ -196,7 +196,7 @@ class Color_Chase(Animation):
             return False
         
 class Custom_Rainbow_Cycle(Animation):
-    """Draw rainbow that uniformly distributes itself across all pixels."""
+    """Draw custom color cycle that uniformly distributes itself across all pixels."""
     def __init__(self, strip, colors):
         super().__init__(self._custom_rainbow_cycle)
         self.strip = strip
@@ -204,6 +204,7 @@ class Custom_Rainbow_Cycle(Animation):
 
     def _custom_rainbow_cycle(self):
         try:
+            num_colors = len(self.colors)
             self.animationStarted = True
             while not self.stopAnimation:
                 for j in range(256 * 5):
@@ -212,10 +213,7 @@ class Custom_Rainbow_Cycle(Animation):
                     for i in range(self.strip.numPixels()):
                         if self.stopAnimation:
                             break
-                        color = self.colors[(int(i * len(self.colors) / self.strip.numPixels()) + j) % len(self.colors)]
-                        r, g, b = color
-                        rgb_color = Color(r, g, b)
-                        self.strip.setPixelColor(i, rgb_color)
+                        self.strip.setPixelColor(i, self.colors[(int(i * 256 / self.strip.numPixels()) + j) % num_colors])
                     self.strip.show()
                     time.sleep(0.02)
         except Exception as e:
