@@ -26,6 +26,19 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
+def custom_wheel(pos, colors):
+    """Generate custom colors across 0-255 positions."""
+    num_colors = len(colors)
+    color_segment = 255 // (num_colors - 1)
+    segment = min(pos // color_segment, num_colors - 2)
+    remainder = pos % color_segment
+    color_start = colors[segment]
+    color_end = colors[segment + 1]
+    r = color_start[0] + (color_end[0] - color_start[0]) * remainder // color_segment
+    g = color_start[1] + (color_end[1] - color_start[1]) * remainder // color_segment
+    b = color_start[2] + (color_end[2] - color_start[2]) * remainder // color_segment
+    return Color(r, g, b)
+
 class Animation():
     def __init__(self, animation_func):
         self._animation_func = animation_func

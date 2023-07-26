@@ -204,8 +204,8 @@ class Custom_Rainbow_Cycle(Animation):
 
     def _custom_rainbow_cycle(self):
         try:
-            num_colors = len(self.colors)
             self.animationStarted = True
+            num_colors = len(self.colors)
             while not self.stopAnimation:
                 for j in range(256 * 5):
                     if self.stopAnimation:
@@ -213,7 +213,7 @@ class Custom_Rainbow_Cycle(Animation):
                     for i in range(self.strip.numPixels()):
                         if self.stopAnimation:
                             break
-                        self.strip.setPixelColor(i, self.colors[(int(i * 256 / self.strip.numPixels()) + j) % num_colors])
+                        self.strip.setPixelColor(i, custom_wheel((int(i * 256 / self.strip.numPixels()) + j) & 255, self.colors))
                     self.strip.show()
                     time.sleep(0.02)
         except Exception as e:
