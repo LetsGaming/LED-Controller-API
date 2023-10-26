@@ -2,7 +2,6 @@ from flask import Flask, send_file
 from flask_cors import CORS
 import importlib
 import os
-import socket
 
 app = Flask(__name__)
 CORS(app)
@@ -25,7 +24,4 @@ for api_file in api_files:
     app.register_blueprint(blueprint)
 
 if __name__ == '__main__':
-    # Get the local network IP address of the machine
-    local_ip = socket.gethostbyname(socket.gethostname())
-    
-    app.run(host=local_ip, port=5000)
+    app.run(host="0.0.0.0", port=5000)
