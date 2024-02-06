@@ -30,7 +30,7 @@ class LEDController():
         self.sunset_activation_thread = threading.Thread(target=suntime_provider.activate_at_sunset)
         self.sunset_activation_thread.start()
 
-    def load_config():
+    def load_config(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(script_dir, "config.json")
         file = open(config_path)
