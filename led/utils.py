@@ -1,4 +1,7 @@
 import time
+from datetime import datetime
+import ephem
+from pytz import timezone
 
 def validate_rgb_values(red, green, blue):
     try:
@@ -38,6 +41,44 @@ def custom_wheel(pos, colors):
     g = color_start[1] + (color_end[1] - color_start[1]) * remainder // color_segment
     b = color_start[2] + (color_end[2] - color_start[2]) * remainder // color_segment
     return Color(r, g, b)
+
+class SunsetProvider():
+    def __init__(self, country, city, set_online_state):
+        self.country = country
+        self.city = city
+        self.set_online_state = set_online_state
+        
+    def get_sunset_time(self, date=None):
+        # Set the observer's location using the country's time zone
+        country_tz = timezone(self.country)
+        city_data = ephem.city(self.city)
+        
+        observer = ephem.Observer()
+        observer.lat = float(city_data.lat)
+        observer.lon = float(city_data.long)
+
+        # Set the date for which you want to get the sunset time
+        if date is None:
+            date = datetime.now(country_tz)
+        observer.date = date
+
+        # Calculate sunset time
+        sunset_time = observer.next_setting(ephem.Sun())
+        
+        # Convert sunset time to the local time zone
+        sunset_time_local = sunset_time.datetime().astimezone(country_tz)
+        
+        return sunset_time_local
+    
+    def activate_at_sunset(self):
+        while True:
+            current_time = datetime.now()
+            if current_time >= self.sunset_time:
+                self.set_online_state(True)
+                # Update sunset time for the next day
+                self.sunset_time = self.get_sunset_time(self.config["location"])
+            
+            time.sleep(60)
 
 class Animation():
     def __init__(self, animation_func):
