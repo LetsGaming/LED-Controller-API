@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import ephem
 from pytz import timezone
 
@@ -78,7 +78,8 @@ class SunsetProvider():
             if current_time >= self.sunset_time:
                 self.set_online_state(True)
                 # Update sunset time for the next day
-                self.sunset_time = self.get_sunset_time()
+                next_day = current_time + timedelta(days=1)
+                self.sunset_time = self.get_sunset_time(next_day)
 
             # Check and deactivate at midnight
             if current_time.hour == 0 and current_time.minute == 0:
