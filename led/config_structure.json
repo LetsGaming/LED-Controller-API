@@ -1,0 +1,20 @@
+{
+    "strip": {
+      "LED_COUNT": 0,
+      "LED_PIN": 0,
+      "LED_FREQ_HZ": 0,
+      "LED_DMA": 0,
+      "LED_BRIGHTNESS": 0,
+      "LED_INVERT": false,
+      "LED_CHANNEL": 0
+    },
+    "location": {
+      "city_name": "",
+      "region": "",
+      "country": "",
+      "latitude": 0.0,
+      "longitude": 0.0,
+      "timezone": ""
+    }
+  }
+  

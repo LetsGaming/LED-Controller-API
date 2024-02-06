@@ -1,22 +1,21 @@
+import json
 import threading
-from rpi_ws281x import *
+from datetime import datetime
+import time
+from astral.sun import sun
+from astral import LocationInfo
+from rpi_wps281x import *
 from led.animations.startAnimations import *
 from led.animations.standardAnimations import *
 from led.animations.customAnimations import *
 from led.animations.specialAnimations import *
 
-
-LED_COUNT = 300
-LED_PIN = 18
-LED_FREQ_HZ = 800000
-LED_DMA = 10
-LED_BRIGHTNESS = 255
-LED_INVERT = False
-LED_CHANNEL = 0
-
 class LEDController():
     def __init__(self):
-        self.strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
+        f = open('config.json')
+
+        self.config = json.load(f)
+        self.strip = Adafruit_NeoPixel(self.config["strip"]["LED_COUNT"], self.config["strip"]["LED_PIN"], self.config["strip"]["LED_FREQ_HZ"], self.config["strip"]["LED_DMA"], self.config["strip"]["LED_INVERT"], self.config["strip"]["LED_BRIGHTNESS"], self.config["strip"]["LED_CHANNEL"])
         self.strip.begin()
         self.current_animation = None
         self.paused_animation = None
@@ -24,15 +23,20 @@ class LEDController():
         self.isOnline = False
 
         # Start with a startup animation and then clearing the strip
-        self.run_startup_animation()
+        self.run_startup_animation(self.config["strip"]["LED_BRIGHTNESS"])
+        self.sunset_time = self.get_sunset_time(self.config["location"])
 
-    def run_startup_animation(self):
+        # Start the sunset activation loop in a separate thread
+        self.sunset_activation_thread = threading.Thread(target=self.activate_at_sunset)
+        self.sunset_activation_thread.start()
+
+    def run_startup_animation(self, brightness):
         self.clear_strip()
         color = (0, 255, 0)
         start_time = time.time()
         duration_ms = 2250
         end_time = start_time + (duration_ms / 1000.0)
-        fade_interval = 1.0 / LED_BRIGHTNESS
+        fade_interval = 1.0 / brightness
 
         while time.time() < end_time:
             elapsed = time.time() - start_time
@@ -45,8 +49,31 @@ class LEDController():
 
         self.clear_strip()
 
+    def get_sunset_time(self, location_config):
+        # Create LocationInfo object
+        location = LocationInfo(location_config["city_name"], "", location_config["country"], location_config["latitude"], location_config["longitude"], location_config["timezone"])
+
+        # Get current date
+        today = datetime.now()
+
+        # Calculate sunset time
+        s = sun(location.observer, date=today)
+        sunset_time = s["sunset"]
+
+        return sunset_time
+    
+    def activate_at_sunset(self):
+        while True:
+            current_time = datetime.now()
+            if current_time >= self.sunset_time:
+                self.set_online_state(True)
+                # Update sunset time for the next day
+                self.sunset_time = self.get_sunset_time(self.config["location"])
+            
+            time.sleep(60)
+
     def clear_strip(self):
-        dark = Color(0,0,0)
+        dark = Color(0, 0, 0)
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, dark)
         self.strip.show()
@@ -112,17 +139,17 @@ class LEDController():
         try:
             if self.isOnline:
                 brightness = int(value)
-                if brightness > -1 and brightness < 256:
+                if 0 <= brightness <= 255:
                     self.strip.setBrightness(brightness)
                     self.strip.show()
                     return True
-                else: 
+                else:
                     print("Value not between allowed range")
                     return False
             else:
                 return "The LED-Strip is turned OFF!"
         except Exception as e:
-            print(e) 
+            print(e)
             return False
 
     def _handle_animation(self, animation: Animation):
@@ -134,12 +161,10 @@ class LEDController():
 
     def set_white(self):
         return self._handle_animation(SetWhite(self.strip))
-        
-    
+
     def fill_color(self, red, green, blue):
         return self._handle_animation(FillColor(self.strip, red, green, blue))
 
-        
     def custom_fill(self, red, green, blue, percentage):
         return self._handle_animation(CustomFill(self.strip, red, green, blue, percentage))
 
@@ -147,23 +172,24 @@ class LEDController():
         return self._handle_animation(Blink(self.strip, red, green, blue, blinking_speed))
 
     def fade(self, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed):
-        return self._handle_animation(Fade(self.strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed))
+        return self._handle_animation(
+            Fade(self.strip, from_red, from_green, from_blue, to_red, to_green, to_blue, steps, fading_speed))
 
     def sparkle(self, red, green, blue, sparkle_count):
         return self._handle_animation(Sparkle(self.strip, red, green, blue, sparkle_count))
-    
+
     def scanner_effect(self, red, green, blue, scan_speed, tail_length):
         return self._handle_animation(ScannerEffect(self.strip, red, green, blue, scan_speed, tail_length))
-    
+
     def yoyo_theater(self, red, green, blue, yoyo_speed):
         return self._handle_animation(YoyoTheater(self.strip, red, green, blue, yoyo_speed))
 
     def breathing_effect(self, red, green, blue, breathing_duration):
         return self._handle_animation(Breathing_Effect(self.strip, red, green, blue, breathing_duration))
-        
+
     def color_wipe(self, red, green, blue):
         return self._handle_animation(Color_Wipe(self.strip, red, green, blue))
-        
+
     def theater_chase(self, red, green, blue):
         return self._handle_animation(Theater_Chase(self.strip, red, green, blue))
 
@@ -172,7 +198,7 @@ class LEDController():
 
     def color_chase(self, red, green, blue):
         return self._handle_animation(Color_Chase(self.strip, red, green, blue))
-        
+
     def custom_rainbow_cycle(self, colors):
         return self._handle_animation(Custom_Rainbow_Cycle(self.strip, colors))
 
