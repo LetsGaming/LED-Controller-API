@@ -1,3 +1,4 @@
+import os
 import json
 import threading
 import time
@@ -9,8 +10,7 @@ from led.animations.specialAnimations import *
 
 class LEDController():
     def __init__(self):
-        f = open('config.json')
-        self.config = json.load(f)
+        self.config = self.load_config()
         strip_config = self.config["strip"]
 
         self.strip = Adafruit_NeoPixel(strip_config["LED_COUNT"], strip_config["LED_PIN"], strip_config["LED_FREQ_HZ"], strip_config["LED_DMA"], strip_config["LED_INVERT"], strip_config["LED_BRIGHTNESS"], strip_config["LED_CHANNEL"])
@@ -29,6 +29,12 @@ class LEDController():
         suntime_provider = SunsetProvider("Europe/Berlin", "Berlin", self.set_online_state)
         self.sunset_activation_thread = threading.Thread(target=suntime_provider.activate_at_sunset)
         self.sunset_activation_thread.start()
+
+    def load_config():
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        config_path = os.path.join(script_dir, "config.json")
+        file = open(config_path)
+        return json.load(file)
 
     def run_startup_animation(self, brightness):
         self.clear_strip()
