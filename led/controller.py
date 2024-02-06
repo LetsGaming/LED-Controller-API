@@ -23,8 +23,7 @@ class LEDController():
 
         # Start with a startup animation and then clearing the strip
         self.run_startup_animation(self.config["strip"]["LED_BRIGHTNESS"])
-        self.sunset_time = self.get_sunset_time(self.config["location"])
-
+        
         # Start the sunset activation loop in a separate thread
         suntime_provider = SunsetProvider("Europe/Berlin", "Berlin", self.set_online_state)
         self.sunset_activation_thread = threading.Thread(target=suntime_provider.activate_at_sunset)
