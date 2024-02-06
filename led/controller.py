@@ -26,7 +26,7 @@ class LEDController():
         
         # Start the sunset activation loop in a separate thread
         suntime_provider = SunsetProvider("Europe/Berlin", "Berlin", self.set_online_state)
-        self.sunset_activation_thread = threading.Thread(target=suntime_provider.activate_at_sunset)
+        self.sunset_activation_thread = threading.Thread(target=suntime_provider.auto_activate_and_deactivate)
         self.sunset_activation_thread.start()
 
     def load_config(self):

@@ -70,14 +70,20 @@ class SunsetProvider():
         
         return sunset_time_local
     
-    def activate_at_sunset(self):
+    def auto_activate_and_deactivate(self):
         while True:
             current_time = datetime.now(self.country_tz)  # Use the country timezone information
+            
+            # Check and activate at sunset
             if current_time >= self.sunset_time:
                 self.set_online_state(True)
                 # Update sunset time for the next day
                 self.sunset_time = self.get_sunset_time()
-            
+
+            # Check and deactivate at midnight
+            if current_time.hour == 0 and current_time.minute == 0:
+                self.set_online_state(False)
+
             time.sleep(60)
 
 
