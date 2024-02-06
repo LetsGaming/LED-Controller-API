@@ -47,6 +47,7 @@ class SunsetProvider():
         self.country = country
         self.city = city
         self.set_online_state = set_online_state
+        self.sunset_time = self.get_sunset_time()
         
     def get_sunset_time(self, date=None):
         # Set the observer's location using the country's time zone
