@@ -3,6 +3,5 @@ adafruit-circuitpython-neopixel
 adafruit-blinka
 flask
 flask_cors
-json
 ephem
 pytz

@@ -1,7 +1,7 @@
 import json
 import threading
 import time
-from rpi_wps281x import *
+from rpi_ws281x import *
 from led.animations.startAnimations import *
 from led.animations.standardAnimations import *
 from led.animations.customAnimations import *
