@@ -44,14 +44,13 @@ def custom_wheel(pos, colors):
 
 class SunsetProvider():
     def __init__(self, country, city, set_online_state):
-        self.country = country
+        self.country_tz = timezone(country)
         self.city = city
         self.set_online_state = set_online_state
         self.sunset_time = self.get_sunset_time()
         
     def get_sunset_time(self, date=None):
         # Set the observer's location using the country's time zone
-        country_tz = timezone(self.country)
         city_data = ephem.city(self.city)
         
         observer = ephem.Observer()
@@ -60,26 +59,27 @@ class SunsetProvider():
 
         # Set the date for which you want to get the sunset time
         if date is None:
-            date = datetime.now(country_tz)
+            date = datetime.now(self.country_tz)
         observer.date = date
 
         # Calculate sunset time
         sunset_time = observer.next_setting(ephem.Sun())
         
         # Convert sunset time to the local time zone
-        sunset_time_local = sunset_time.datetime().astimezone(country_tz)
+        sunset_time_local = sunset_time.datetime().astimezone(self.country_tz)
         
         return sunset_time_local
     
     def activate_at_sunset(self):
         while True:
-            current_time = datetime.now()
+            current_time = datetime.now(self.country_tz)  # Use the country timezone information
             if current_time >= self.sunset_time:
                 self.set_online_state(True)
                 # Update sunset time for the next day
-                self.sunset_time = self.get_sunset_time(self.config["location"])
+                self.sunset_time = self.get_sunset_time()
             
             time.sleep(60)
+
 
 class Animation():
     def __init__(self, animation_func):
