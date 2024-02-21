@@ -1,4 +1,6 @@
-Obsolete: I will no longer support this version of the implementation. You're still free to use it, but if you want further support see: [LED-Controller-Websocket](https://github.com/LetsGaming/LED-Controller-Websocket)
+Obsolete: I will no longer support this version of the implementation. 
+You're still free to use it, but if you want further support see: [LED-Controller-Websocket](https://github.com/LetsGaming/LED-Controller-Websocket)
+
 # LED Controller
 This repository contains the code for the LED Controller, which receives LED control commands from the LED Control API and controls a WS2812B LED strip connected to a Raspberry Pi.
 ### Note
